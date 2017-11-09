@@ -20,7 +20,7 @@ end
 
 
 local server_table = {}
-local arp_table = luci.sys.net.arptable() or {}
+local arp_table = luci.ip.neighbors() or {}
 local encrypt_methods = {
 	"table",
 	"rc4",
@@ -31,7 +31,7 @@ local encrypt_methods = {
 	"aes-256-cfb",
 	"aes-128-ctr",
 	"aes-192-ctr",
-	"aes-256-ctr",	
+	"aes-256-ctr",
 	"bf-cfb",
 	"camellia-128-cfb",
 	"camellia-192-cfb",
@@ -49,7 +49,7 @@ local encrypt_methods = {
 local protocol = {
 	"origin",
 	"verify_simple",
-	"verify_sha1",		
+	"verify_sha1",
 	"auth_sha1",
 	"auth_sha1_v2",
 	"auth_sha1_v4",
@@ -61,14 +61,14 @@ obfs = {
 	"plain",
 	"http_simple",
 	"http_post",
-	"tls_simple",	
+	"tls_simple",
 	"tls1.2_ticket_auth",
 }
 
 m = Map(shadowsocksr, translate("Edit ShadowSocksR Server"))
 m.redirect = luci.dispatcher.build_url("admin/services/shadowsocksr/client")
 if m.uci:get(shadowsocksr, sid) ~= "servers" then
-	luci.http.redirect(m.redirect) 
+	luci.http.redirect(m.redirect)
 	return
 end
 
@@ -115,6 +115,7 @@ o = s:option(ListValue, "protocol", translate("Protocol"))
 for _, v in ipairs(protocol) do o:value(v) end
 o.rmempty = false
 
+o = s:option(Value, "protocol_param", translate("Protocol param(optional)"))
 
 o = s:option(ListValue, "obfs", translate("Obfs"))
 for _, v in ipairs(obfs) do o:value(v) end
@@ -139,7 +140,7 @@ function o.validate(self, value, section)
     if not fs.access(kcp_file)  then
         return nil, translate("Haven't a Kcptun executable file")
     elseif  not isKcptun(kcp_file) then
-        return nil, translate("Not a Kcptun executable file")    
+        return nil, translate("Not a Kcptun executable file")
     end
     end
 
@@ -152,5 +153,10 @@ o.password = true
 o = s:option(Value, "kcp_param", translate("KcpTun Param"))
 o.default = "--nocomp"
 
+
+o = s:option(DummyValue,"ssr_url","SSR URL") 
+o.rawhtml  = true
+o.template = "shadowsocksr/ssrurl"
+o.value =sid
 
 return m

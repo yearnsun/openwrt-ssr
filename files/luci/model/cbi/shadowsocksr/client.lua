@@ -13,17 +13,17 @@ local gfwmode=0
 local pdnsd_flag=0
 
 if nixio.fs.access("/etc/dnsmasq.ssr/gfw_list.conf") then
-gfwmode=1		
+gfwmode=1
 end
 
 if nixio.fs.access("/etc/pdnsd.conf") then
-pdnsd_flag=1		
+pdnsd_flag=1
 end
 
 m = Map(shadowsocksr, translate("ShadowSocksR Client"))
 
 local server_table = {}
-local arp_table = luci.sys.net.arptable() or {}
+local arp_table = luci.ip.neighbors() or {}
 local encrypt_methods = {
 	"table",
 	"rc4",
@@ -34,7 +34,7 @@ local encrypt_methods = {
 	"aes-256-cfb",
 	"aes-128-ctr",
 	"aes-192-ctr",
-	"aes-256-ctr",	
+	"aes-256-ctr",
 	"bf-cfb",
 	"camellia-128-cfb",
 	"camellia-192-cfb",
@@ -52,7 +52,7 @@ local encrypt_methods = {
 local protocol = {
 	"origin",
 	"verify_simple",
-	"verify_sha1",		
+	"verify_sha1",
 	"auth_sha1",
 	"auth_sha1_v2",
 	"auth_sha1_v4",
@@ -64,7 +64,7 @@ obfs = {
 	"plain",
 	"http_simple",
 	"http_post",
-	"tls_simple",	
+	"tls_simple",
 	"tls1.2_ticket_auth",
 }
 
@@ -168,7 +168,7 @@ o.datatype = "uinteger"
 o:depends("enable_switch", "1")
 o.default = 3
 
-if gfwmode==0 then 
+if gfwmode==0 then
 
 o = s:option(Flag, "tunnel_enable", translate("Enable Tunnel(DNS)"))
 o.default = 0
